@@ -1,1 +1,1 @@
-console.log("app.js is connected ✅");
+console.log("js added and pushed");
