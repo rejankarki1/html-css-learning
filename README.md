@@ -14,6 +14,8 @@ https://rejankarki1.github.io/html-css-learning/
 ##  Tech Stack
 - HTML5
 - CSS3
+- Js beginner 
+
 
 ##  Purpose
 This project is part of my frontend learning journey, focused on practicing layouts, positioning, and styling with HTML and CSS.
