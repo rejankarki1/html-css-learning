@@ -1,84 +1,58 @@
-// 1. Mock Data (Simulating a database)
-const songLibrary = [
-    { name: "Top 50 - Global", artist: "Spotify", img: "./assets/card1img.jpeg" },
-    { name: "Trending #1", artist: "Kendrick Lamar", img: "./assets/card1.png" },
-    { name: "After Hours", artist: "The Weeknd", img: "./assets/card2.png" },
-    { name: "Drive Mix", artist: "Nightly", img: "./assets/card3.png" },
-    { name: "Rock Classics", artist: "Various Artists", img: "./assets/card4.png" }
+const songList = [
+    { id: 1, title: "Top 50 - Global", artist: "Global Hits", img: "./assets/card1img.jpeg", file: "song1.mp3" },
+    { id: 2, title: "Top 50 - Nepal", artist: "Nepal Charts", img: "./assets/nepal.png", file: "song2.mp3" },
+    { id: 3, title: "Top 50 - USA", artist: "USA Hot 100", img: "./assets/usa.png", file: "song3.mp3" }
 ];
-
-// 2. Select Elements
-const playBtn = document.querySelector('.play-btn');
-const albumCover = document.querySelector('.album-cover');
-const trackName = document.querySelector('.track-name');
-const trackArtist = document.querySelector('.track-artist');
-const cards = document.querySelectorAll('.card');
-
-// 3. Play/Pause Toggle Logic
 let isPlaying = false;
+let currentSongIndex = 0;
+const audio = new Audio(); // Modern JS Audio API
+const cardContainer = document.querySelector(".cards-container");
 
-function setPlayState(playing) {
-    isPlaying = playing;
+const renderCards = () => {
+    cardContainer.innerHTML = songList.map((song, index) => `
+        <div class="card" onclick="playSong(${index})">
+            <img src="${song.img}" class="card-img">
+            <p class="card-title">${song.title}</p>
+            <p class="card-info">${song.artist}</p>
+        </div>
+    `).join('');
+};
 
+const playSong = (index) => {
+    currentSongIndex = index;
+    const { title, artist, img, file } = songList[index];
+
+    // Update the UI at the bottom
+    document.querySelector(".track-name").innerText = title;
+    document.querySelector(".track-artist").innerText = artist;
+    document.querySelector(".album-cover").src = img;
+
+    // Play the audio
+    audio.src = file;
+    audio.play();
+    isPlaying = true;
+    updatePlayButton();
+};
+
+const playBtn = document.querySelector(".play-btn");
+
+const updatePlayButton = () => {
     if (isPlaying) {
-        playBtn.classList.replace('fa-circle-play', 'fa-circle-pause');
-        console.log('Music started');
+        playBtn.classList.replace("fa-circle-play", "fa-circle-pause");
     } else {
-        playBtn.classList.replace('fa-circle-pause', 'fa-circle-play');
-        console.log('Music stopped');
+        playBtn.classList.replace("fa-circle-pause", "fa-circle-play");
     }
-}
+};
 
-playBtn.addEventListener('click', () => {
-    setPlayState(!isPlaying);
+playBtn.addEventListener("click", () => {
+    if (isPlaying) {
+        audio.pause();
+    } else {
+        audio.play();
+    }
+    isPlaying = !isPlaying; // Toggle state
+    updatePlayButton();
 });
 
-// 4. "Now Playing" Switcher
-cards.forEach((card) => {
-    card.addEventListener('click', () => {
-        // Grab data from the clicked card's elements
-        const newImg = card.querySelector('.card-img').src;
-        const newTitle = card.querySelector('.card-title').textContent;
-
-        // Update the bottom player DOM
-        albumCover.src = newImg;
-        trackName.textContent = newTitle;
-        trackArtist.textContent = 'Playing from Library';
-
-        // Auto-play when a song is selected
-        setPlayState(true);
-    });
-});
-
-// 5. Quit shortcut:
-// Press "q" or "Escape" to stop playback quickly.
-document.addEventListener('keydown', (event) => {
-    const pressedKey = event.key.toLowerCase();
-
-    if (pressedKey === 'q' || event.key === 'Escape') {
-        setPlayState(false);
-        console.log('Quit action: playback stopped');
-    }
-});
-
-// 6. Async/Await Example: Simulating a "Loading" effect
-async function loadApp() {
-    console.log('Fetching songs...');
-
-    // Create a custom delay (Promise)
-    const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-    try {
-        await delay(1500); // Wait 1.5 seconds
-        console.log('Songs loaded successfully!');
-        // Here you could dynamically generate HTML cards,
-        // but for now, we'll just fade the body in.
-        document.body.style.opacity = '1';
-    } catch (error) {
-        console.error('Failed to load songs', error);
-    }
-}
-
-// Set initial opacity to 0 in JS (or CSS) to see the effect
-document.body.style.transition = 'opacity 1s ease';
-loadApp();
+// Initialize the app
+renderCards();
